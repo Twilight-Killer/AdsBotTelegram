@@ -34,7 +34,7 @@ try:
     PM_MSG = config("PM_MSG")
     PM_MEDIA = config("PM_MEDIA", default=None)
 except Exception as e:
-    log.warning("Missing config vars {}".format(e))
+    log.warning("Konfigurasi vars salah {}".format(e))
     exit(1)
 
 OWNERS = [int(i) for i in owonerz.split(" ")]
@@ -59,20 +59,20 @@ except Exception as e:
     exit(1)
 
 
-@client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^/alive$"))
+@client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^,stat$"))
 async def start(event):
-    await event.reply("ADsBot is running.")
+    await event.reply("Scheduler is running.")
 
 
-@client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^/messages$"))
+@client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^,skejul$"))
 async def get_msgs(event):
-    txt = "**Total messages added:** {}\n\n".format(len(MESSAGES))
+    txt = "**Total pesan schedule saat ini:** {}\n\n".format(len(MESSAGES))
     for c, i in enumerate(MESSAGES, start=1):
         txt += "**{}.** {}\n".format(c, i)
     if len(txt) >= 4096:
         with open("msgs.txt", "w") as f:
             f.write(txt.replace("**", ""))
-        await event.reply("All added messages", file="msgs.txt")
+        await event.reply("Semua pesan ditambahkan", file="msgs.txt")
         remove("msgs.txt")
     else:
         await event.reply(txt)
@@ -84,17 +84,16 @@ async def get_msgs(event):
     )
 )
 async def pm_msg(event):
-    await asyncio.sleep(random.randint(5, 10))
-    await event.reply(PM_MSG, file=PM_MEDIA)
+    await event.respond(PM_MSG, file=PM_MEDIA)
 
 
 async def send_msg():
     global TIMES_SENT
-    log.info("Number of times message was sent: {}".format(TIMES_SENT))
+    log.info("Jumlah waktu pesan yang dikirim: {}".format(TIMES_SENT))
     try:
         await client.send_message(GROUP_ID, random.choice(MESSAGES))
     except Exception as e:
-        log.warning("Error sending message: {}".format(str(e)))
+        log.warning("Error mengirim pesan: {}".format(str(e)))
     TIMES_SENT += 1
 
 
@@ -105,7 +104,7 @@ log.info("Starting scheduler with a {} second gap...".format(TIME_DELAY))
 scheduler = AsyncIOScheduler()
 scheduler.add_job(send_msg, "interval", seconds=TIME_DELAY)
 scheduler.start()
-log.info("\n\nStarted.\n(c) @HaoTogelLivedraw.\n")
+log.info("\n\nStarted.\n(c) @HaoTogelLivedraw.")
 
 
 client.run_until_disconnected()
