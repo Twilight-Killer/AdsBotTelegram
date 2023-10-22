@@ -1,9 +1,3 @@
-# -*- coding: utf-8 -*-
-# < (c) @xditya , https://xditya.me >
-# ADsBot, 2021.
-
-# Paid source, re-distributing without contacting the code owner is NOT allowed.
-
 import logging
 import random
 import asyncio
@@ -34,7 +28,7 @@ try:
     PM_MSG = config("PM_MSG")
     PM_MEDIA = config("PM_MEDIA", default=None)
 except Exception as e:
-    log.warning("Konfigurasi vars salah {}".format(e))
+    log.warning("Missing config vars {}".format(e))
     exit(1)
 
 OWNERS = [int(i) for i in owonerz.split(" ")]
@@ -58,21 +52,24 @@ except Exception as e:
     log.warning(e)
     exit(1)
 
+async def handler(event):
+    chat = await event.get_chat()
+    sender = await event.get_sender()
 
 @client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^,stat$"))
 async def start(event):
-    await event.reply("Scheduler is running.")
+    await event.reply("`Scheduler is running...`")
 
 
 @client.on(events.NewMessage(incoming=True, from_users=OWNERS, pattern="^,skejul$"))
 async def get_msgs(event):
-    txt = "**Total pesan schedule saat ini:** {}\n\n".format(len(MESSAGES))
+    txt = "**Total pesan schedule berjalan saat ini:** {}\n\n".format(len(MESSAGES))
     for c, i in enumerate(MESSAGES, start=1):
         txt += "**{}.** {}\n".format(c, i)
     if len(txt) >= 4096:
         with open("msgs.txt", "w") as f:
             f.write(txt.replace("**", ""))
-        await event.reply("Semua pesan ditambahkan", file="msgs.txt")
+        await event.reply("Semua pesan ditambah", file="msgs.txt")
         remove("msgs.txt")
     else:
         await event.reply(txt)
@@ -89,7 +86,7 @@ async def pm_msg(event):
 
 async def send_msg():
     global TIMES_SENT
-    log.info("Jumlah waktu pesan yang dikirim: {}".format(TIMES_SENT))
+    log.info("Pesan terkirim: {}".format(TIMES_SENT))
     try:
         await client.send_message(GROUP_ID, random.choice(MESSAGES))
     except Exception as e:
@@ -100,7 +97,7 @@ async def send_msg():
 logging.getLogger("apscheduler.executors.default").setLevel(
     logging.WARNING
 )  # silent, log only errors.
-log.info("Starting scheduler with a {} second gap...".format(TIME_DELAY))
+log.info("Memulai scheduler dengan {} detik...".format(TIME_DELAY))
 scheduler = AsyncIOScheduler()
 scheduler.add_job(send_msg, "interval", seconds=TIME_DELAY)
 scheduler.start()
